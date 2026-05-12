@@ -1099,43 +1099,6 @@ local function handle_profile_io()
 
     _hold_loc_prev_en = hl_en
 
-    -- Diagnostic: dump every buff currently on the player.  Lets users
-    -- verify a spell's "Buff Condition" hash matches an actually-active
-    -- buff (the SKILL hash and the BUFF EFFECT hash are different in
-    -- D4, and picking the wrong one is the most common cause of
-    -- Missing-mode never blocking).
-    if gui.elements.bf_dump_buffs and gui.elements.bf_dump_buffs:get() then
-        gui.elements.bf_dump_buffs:set(false)
-        local player = get_local_player()
-        if not player or type(player.get_buffs) ~= 'function' then
-            console.print('[UniversalRotation] Dump buffs: no local player / get_buffs unavailable')
-        else
-            local ok, buffs = pcall(player.get_buffs, player)
-            if not ok or type(buffs) ~= 'table' then
-                console.print('[UniversalRotation] Dump buffs: get_buffs failed')
-            elseif #buffs == 0 then
-                console.print('[UniversalRotation] Dump buffs: no active buffs')
-            else
-                console.print(string.format(
-                    '[UniversalRotation] Dump buffs: %d active', #buffs))
-                for i, b in ipairs(buffs) do
-                    if b then
-                        local h = (type(b.name_hash) == 'number' and b.name_hash) or 0
-                        local n = ''
-                        if type(b.name) == 'function' then
-                            local ok_n, v = pcall(b.name, b)
-                            if ok_n and v then n = tostring(v) end
-                        end
-                        local s = (type(b.stacks) == 'number' and b.stacks) or 0
-                        console.print(string.format(
-                            '  [%d] hash=%s stacks=%d name=%s',
-                            i, tostring(h), s, n))
-                    end
-                end
-            end
-        end
-    end
-
     -- Manual "Set Position Here" button
     if gui.elements.hold_location_set_btn and gui.elements.hold_location_set_btn:get() then
         local lp2 = get_local_player()

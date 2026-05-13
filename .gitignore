@@ -1,6 +1,34 @@
-*.json
+# Only .lua scripts belong in this repo
+
+# Tooling / sync scripts
 *.ps1
-universal_rotation_debug.log
+*.bat
+*.sh
+
+# Claude AI working directory
+.claude/
 .claude
-/#api/*
-claude.md
+
+# Logs and debug output
+*.log
+*.txt
+
+# Markdown / documentation
+*.md
+
+# JSON configs or exports
+*.json
+
+# Windows OS artifacts
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Editor folders
+.vscode/
+.idea/
+
+# Temp / backup files
+*.tmp
+*.bak
+*.swp

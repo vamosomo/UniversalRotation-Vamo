@@ -10,6 +10,7 @@ local GLOBAL_GCD     = 0.05   -- minimal delay between any two casts
 local _gcd_until     = 0.0
 local _scan_range    = 16.0
 local _move_until    = 0.0
+local _los_opts      = nil    -- set each tick from settings; used by _get_aim_target
 
 -- Chain boosts: [spell_id] = { priority_boost, expires_at }
 -- After a spell with use_chain fires, the target spell's effective priority is temporarily lowered
@@ -494,7 +495,7 @@ local function _get_aim_target(aim_mode, player_pos, scan_range)
     if aim_mode == 0 then logger.log('_get_aim_target: No Aim, skipping'); return nil end
 
     logger.log(string.format('_get_aim_target: aim_mode=%d scan_range=%s', aim_mode, tostring(scan_range)))
-    local t = target_selector.get_targets(player_pos, scan_range or 30)
+    local t = target_selector.get_targets(player_pos, scan_range or 30, _los_opts)
     local enemy = t and t.closest
     if not enemy then logger.log('_get_aim_target: no enemy found'); return nil end
 
@@ -714,7 +715,11 @@ function rotation_engine.tick(equipped_ids, settings)
         scan_center = settings.hold_location_pos
         scan_r      = settings.hold_location_range or 15.0
     end
-    local targets = target_selector.get_targets(scan_center, scan_r)
+    _los_opts = settings.los_enabled and {
+        los_enabled    = true,
+        los_height_max = settings.los_height_max or 1.5,
+    } or nil
+    local targets = target_selector.get_targets(scan_center, scan_r, _los_opts)
 
     local spell_list = {}
     for _, spell_id in ipairs(equipped_ids) do

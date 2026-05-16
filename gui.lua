@@ -1,5 +1,5 @@
 local plugin_label   = 'magoogles_universal_rotation'
-local plugin_version = '1.0.32'
+local plugin_version = '1.0.34'
 console.print('Lua Plugin - Magoogles Universal Rotation - v' .. plugin_version)
 
 local gui = {}
@@ -92,6 +92,9 @@ gui.elements = {
     -- external plugin controls when to fight.
     external_target_override = cb(false, 'external_target_override'),
     debug_mode     = cb(false, 'debug_mode'),
+
+    los_enabled    = cb(false, 'los_enabled'),
+    los_height_max = sf(0.3, 8.0, 1.5, 'los_height_max'),
 
 
     overlay_enabled = cb(true, 'overlay_enabled'),
@@ -288,6 +291,15 @@ gui.render = function(spell_config, equipped_ids, all_known_ids, profile_names, 
         gui.elements.global_min_enemies:render('Global Min Enemies', 'Minimum enemies required globally before any spell fires (0 = off). Per-spell min is also respected — whichever is higher wins.', 1)
         gui.elements.respect_orb:render('Respect Orbwalker', 'Only run the rotation while the orbwalker is in clear/pvp mode (or while Hold-to-Cast is held). Recommended ON to avoid fighting your orbwalker.')
         gui.elements.allow_movement:render('Allow Movement', 'Let the rotation move the character into melee range (pathfinder.request_move). Turn OFF if you want the orbwalker to handle ALL movement.')
+        gui.elements.los_enabled:render('Line-of-Sight Filter',
+            'Skip targets blocked by walls or on unreachable cliffs. '
+            .. 'Uses a wall-collision check and a height-difference check. '
+            .. 'Enable if the rotation spins on enemies through walls or across ledges.')
+        if gui.elements.los_enabled:get() then
+            gui.elements.los_height_max:render('Max Height Diff (cliff)',
+                'Enemies more than this many units above or below the player are ignored. '
+                .. '1.5 is a safe default — raise it only if your build legitimately attacks uphill.', 1)
+        end
         gui.elements.external_target_override:render('External Target Override',
             'When ON, UR ONLY casts at the target an external plugin '
             .. 'has picked (_G.EXTERNAL_ROTATION_TARGET).  No fallback '

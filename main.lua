@@ -136,6 +136,8 @@ local function update_settings()
     settings.hold_location_enabled = gui.elements.hold_location_enabled and gui.elements.hold_location_enabled:get() or false
     settings.hold_location_range   = gui.elements.hold_location_range   and gui.elements.hold_location_range:get()   or 15.0
     settings.hold_location_pos     = _hold_pos
+    settings.los_enabled    = gui.elements.los_enabled    and gui.elements.los_enabled:get()    or false
+    settings.los_height_max = gui.elements.los_height_max and gui.elements.los_height_max:get() or 1.5
     rotation_engine.set_scan_range(settings.scan_range)
 
     -- Sync buff dropdown filters to buff_provider

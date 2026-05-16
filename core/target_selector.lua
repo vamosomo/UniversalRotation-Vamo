@@ -87,7 +87,7 @@ local function _count_nearby(all_enemies, center_pos, radius)
     return c
 end
 
-function target_selector.get_targets(player_pos, range)
+function target_selector.get_targets(player_pos, range, options)
     range = range or SCAN_RANGE
     local r2 = range * range
 
@@ -118,6 +118,21 @@ function target_selector.get_targets(player_pos, range)
 
         local d2 = _dist2(epos, player_pos)
         if d2 > r2 then goto continue end
+
+        -- Line-of-sight / cliff filter (opt-in via options.los_enabled)
+        if options and options.los_enabled then
+            -- Height check: skip enemies on unreachable cliffs or floors
+            local ok_z, dz = pcall(function()
+                return math.abs(player_pos:z() - epos:z())
+            end)
+            if ok_z and dz and dz > (options.los_height_max or 1.5) then goto continue end
+
+            -- Wall check via prediction module (single fast call)
+            if prediction and type(prediction.is_wall_collision) == 'function' then
+                local ok_w, blocked = pcall(prediction.is_wall_collision, player_pos, epos, 1.0)
+                if ok_w and blocked then goto continue end
+            end
+        end
 
         result.is_valid = true
         result.enemy_count = result.enemy_count + 1
